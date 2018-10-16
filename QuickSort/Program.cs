@@ -26,17 +26,22 @@ namespace Project2
                        var testParams = (TestOptions) opts;
                        // run your tests
                        // YOUR CODE GOES HERE
-                       switch(testParams.type)
+                       switch (testParams.type)
                        {
                            case TestMethods.both:
-                               var bList1 = GenerateTest(int.Parse(testParams.TestCount), int.Parse(testParams.TestCount));
+                               var bList1 = GenerateTest(int.Parse(testParams.TestCount));
                                var bList2 = bList1;
                                break;
                            case TestMethods.par:
-                               var pList = GenerateTest(int.Parse(testParams.TestCount), int.Parse(testParams.TestCount));
+                               var pList = GenerateTest(int.Parse(testParams.TestCount));
                                break;
                            case TestMethods.seq:
-                               var sList = GenerateTest(int.Parse(testParams.TestCount), int.Parse(testParams.TestCount));
+                               var sList = GenerateTest(int.Parse(testParams.TestCount));
+                               sList.QuicksortSequential();
+                               Console.WriteLine();
+                               sList.ForEach(e => {
+                                   Console.WriteLine(e);
+                               });
                                break;
                        }
 
@@ -75,14 +80,14 @@ namespace Project2
         /// <summary>
         /// Generates a test list of ints for quicksort
         /// </summary>
-        public static List<int> GenerateTest(int count, int range)
+        public static List<int> GenerateTest(int count)
         {
             var rand = new Random();
             var sortList = new List<int>();
 
             for (int i = 0; i < count; i++)
             {
-                sortList.Add(rand.Next(range));
+                sortList.Add(rand.Next());
             }
 
             return sortList;
