@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using CommandLine;
 
@@ -24,6 +25,7 @@ namespace Project2
                    .WithParsed(opts =>
                    {
                        var testParams = (TestOptions) opts;
+                       var stopWatch = new Stopwatch();
                        // run your tests
                        // YOUR CODE GOES HERE
                        switch (testParams.type)
@@ -31,17 +33,24 @@ namespace Project2
                            case TestMethods.both:
                                var bList1 = GenerateTest(int.Parse(testParams.TestCount));
                                var bList2 = bList1;
+                               stopWatch.Start();
+                               bList1.QuicksortSequential();
+                               stopWatch.Stop();
+                               Console.WriteLine("Sequential");
+                               Console.WriteLine(stopWatch.Elapsed.ToString("s\\.fffffff"));
+                               stopWatch.Restart();
+                               bList2.QuicksortParallel();
+                               stopWatch.Stop();
+                               Console.WriteLine("Parallel");
+                               Console.WriteLine(stopWatch.Elapsed.ToString("s\\.fffffff"));
                                break;
                            case TestMethods.par:
                                var pList = GenerateTest(int.Parse(testParams.TestCount));
+                               pList.QuicksortParallel();
                                break;
                            case TestMethods.seq:
                                var sList = GenerateTest(int.Parse(testParams.TestCount));
                                sList.QuicksortSequential();
-                               Console.WriteLine();
-                               sList.ForEach(e => {
-                                   Console.WriteLine(e);
-                               });
                                break;
                        }
 

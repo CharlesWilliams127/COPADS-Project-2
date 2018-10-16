@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Text;
 
 namespace Project2
 {
     public static class Extensions
     {
+
         static void Swap<T>(this IList<T> list, int index1, int index2)
         {
             var temp = list[index1];
@@ -48,6 +50,35 @@ namespace Project2
             return mark;
         }
 
+        #region Parallel Quicksort
+        private static void InnerQuicksortParallel<T>(this IList<T> list, int left, int right) where T : IComparable
+        {
+            if (left > right || left < 0 || right < 0) return;
+
+            // get a partition index out of our current list
+            var partitionIndex = list.Partition(left, right);
+
+            // if we ever recieve a -1 as a return val our list is sorted
+            if (partitionIndex != -1)
+            {
+                // recursively call quicksort on our two sub-lists divided by the partition
+                // parallelize each sub-list since the algorithm is a divide-and-conquer
+                // one, this should be completely thread-safe as each method will work
+                // on a different part of the list
+                Parallel.Invoke(
+                    () => list.InnerQuicksortParallel(left, partitionIndex - 1),
+                    () => list.InnerQuicksortParallel(partitionIndex + 1, right)
+                    );
+            }
+        }
+
+        public static void QuicksortParallel<T>(this IList<T> list) where T : IComparable
+        {
+            list.InnerQuicksortParallel(0, list.Count - 1);
+        }
+        #endregion
+
+        #region Sequential Quicksort
         private static void InnerQuicksortSequential<T>(this IList<T> list, int left, int right) where T: IComparable
         {
             if (left > right || left < 0 || right < 0) return;
@@ -68,5 +99,6 @@ namespace Project2
         {
             list.InnerQuicksortSequential(0, list.Count - 1);
         }
+        #endregion
     }
 }
