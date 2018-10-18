@@ -33,6 +33,7 @@ namespace Project2
                            case TestMethods.both:
                                var bList1 = GenerateTest(int.Parse(testParams.TestCount));
                                var bList2 = bList1;
+                               Console.WriteLine("Detected {0} Processors", Environment.ProcessorCount);
                                stopWatch.Start();
                                bList1.QuicksortSequential();
                                stopWatch.Stop();
@@ -46,11 +47,21 @@ namespace Project2
                                break;
                            case TestMethods.par:
                                var pList = GenerateTest(int.Parse(testParams.TestCount));
+                               Console.WriteLine("Detected {0} Processors", Environment.ProcessorCount);
+                               stopWatch.Start();
                                pList.QuicksortParallel();
+                               stopWatch.Stop();
+                               Console.WriteLine("Parallel");
+                               Console.WriteLine(stopWatch.Elapsed.ToString("s\\.fffffff"));
                                break;
                            case TestMethods.seq:
                                var sList = GenerateTest(int.Parse(testParams.TestCount));
+                               Console.WriteLine("Detected {0} Processors", Environment.ProcessorCount);
+                               stopWatch.Start();
                                sList.QuicksortSequential();
+                               stopWatch.Stop();
+                               Console.WriteLine("Sequential");
+                               Console.WriteLine(stopWatch.Elapsed.ToString("s\\.fffffff"));
                                break;
                        }
 
