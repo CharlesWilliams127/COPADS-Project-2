@@ -51,7 +51,7 @@ namespace Project2
         }
 
         #region Parallel Quicksort
-        private static void InnerQuicksortParallel<T>(this IList<T> list, int left, int right) where T : IComparable
+        private static void InnerQuicksortParallel<T>(this IList<T> list, int left, int right, int capacity) where T : IComparable
         {
             if (left > right || left < 0 || right < 0) return;
 
@@ -61,20 +61,32 @@ namespace Project2
             // if we ever recieve a -1 as a return val our list is sorted
             if (partitionIndex != -1)
             {
-                // recursively call quicksort on our two sub-lists divided by the partition
-                // parallelize each sub-list since the algorithm is a divide-and-conquer
-                // one, this should be completely thread-safe as each method will work
-                // on a different part of the list
-                Parallel.Invoke(
-                    () => list.InnerQuicksortParallel(left, partitionIndex - 1),
-                    () => list.InnerQuicksortParallel(partitionIndex + 1, right)
-                    );
+                // if we are out of available threads then switch to sequential
+                if (capacity < 1)
+                {
+                    list.InnerQuicksortSequential(left, partitionIndex - 1);
+                    list.InnerQuicksortSequential(partitionIndex + 1, right);
+                }
+                else
+                {
+                    // decrement our capacity to show that a thread is in use
+                    capacity--;
+
+                    // recursively call quicksort on our two sub-lists divided by the partition
+                    // parallelize each sub-list since the algorithm is a divide-and-conquer
+                    // one, this should be completely thread-safe as each method will work
+                    // on a different part of the list
+                    Parallel.Invoke(
+                        () => list.InnerQuicksortParallel(left, partitionIndex - 1, capacity),
+                        () => list.InnerQuicksortParallel(partitionIndex + 1, right, capacity)
+                        );
+                }
             }
         }
 
         public static void QuicksortParallel<T>(this IList<T> list) where T : IComparable
         {
-            list.InnerQuicksortParallel(0, list.Count - 1);
+            list.InnerQuicksortParallel(0, list.Count - 1, Environment.ProcessorCount);
         }
         #endregion
 
