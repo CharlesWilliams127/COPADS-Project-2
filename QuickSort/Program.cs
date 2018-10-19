@@ -69,9 +69,37 @@ namespace Project2
                    .WithNotParsed(err =>
                    {
                        parser.ParseArguments<Options>(args)
-                           .WithParsed(opts => { 
+                           .WithParsed(opts => {
                                // sort the file and output to stdout
                                // YOUR CODE GOES HERE
+                               try
+                               {
+                                   var fileContent = File.ReadAllLines(opts.FileName);
+                                   if (opts.parseint)
+                                   {
+                                       var fileList = new List<int>(Array.ConvertAll(fileContent, e => int.Parse(e)));
+                                       SortAndPrint(fileList);
+                                   }
+                                   else
+                                   {
+                                       var fileList = new List<string>(fileContent);
+                                       SortAndPrint(fileList);
+                                   }
+                               }
+                               catch (FileNotFoundException)
+                               {
+                                   Console.WriteLine();
+                                   Console.WriteLine("The file specified was not found.");
+                                   Console.WriteLine("Please try again.");
+                                   Console.WriteLine();
+                               }
+                               catch (FormatException)
+                               {
+                                   Console.WriteLine();
+                                   Console.WriteLine("The file specified contained an incorrect value.");
+                                   Console.WriteLine("Please fix the file and try again.");
+                                   Console.WriteLine();
+                               }
                            })
                            .WithNotParsed(errs =>
                            {
@@ -98,9 +126,23 @@ namespace Project2
         }
 
         /// <summary>
+        /// Helper method to sort and print our file reads
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        private static void SortAndPrint<T>(List<T> list ) where T: IComparable
+        {
+            Console.WriteLine();
+            list.QuicksortParallel();
+            list.ForEach(e => {
+                Console.WriteLine(e);
+            });
+        }
+
+        /// <summary>
         /// Generates a test list of ints for quicksort
         /// </summary>
-        public static List<int> GenerateTest(int count)
+        private static List<int> GenerateTest(int count)
         {
             var rand = new Random();
             var sortList = new List<int>();
@@ -112,6 +154,5 @@ namespace Project2
 
             return sortList;
         }
-
     }
 }
